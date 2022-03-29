@@ -24,6 +24,7 @@ function sketch(p:p5) {
     const canvas = p.createCanvas(800, 600)
     canvas.parent('game')
     canvas.style('border', '1px solid black')
+    canvas.elt.onselectstart = () => false
     displayGrid()
   }
 
