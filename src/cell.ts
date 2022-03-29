@@ -80,10 +80,10 @@ function drawArrow(r:Rect, dir:D4, p:p5) : void {
   p.fill(255)
   p.applyMatrix(r.width, 0, 0, r.height, r.x, r.y)
   switch(dir) {
-    case 'up': p.triangle(1/3, 2/3, 2/3, 2/3, 1/2, 1/4); break
-    case 'down': p.triangle(1/3, 1/3, 2/3, 1/3, 1/2, 3/4); break
-    case 'left': p.triangle(2/3, 1/3, 2/3, 2/3, 1/4, 1/2); break
-    case 'right': p.triangle(1/3, 1/3, 1/3, 2/3, 3/4, 1/2); break
+    case 'up': p.triangle(1/4, 2/3, 3/4, 2/3, 1/2, 1/4); break
+    case 'down': p.triangle(1/4, 1/3, 3/4, 1/3, 1/2, 3/4); break
+    case 'left': p.triangle(2/3, 1/4, 2/3, 3/4, 1/4, 1/2); break
+    case 'right': p.triangle(1/3, 1/4, 1/3, 3/4, 3/4, 1/2); break
   }
   p.resetMatrix()
 }
