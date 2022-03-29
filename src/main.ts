@@ -22,6 +22,7 @@ function sketch(p:p5) {
 
   p.setup = function() : void {
     const canvas = p.createCanvas(800, 600)
+    canvas.parent('game')
     canvas.style('border', '1px solid black')
     displayGrid()
   }
