@@ -121,7 +121,17 @@ export default class Cell {
 
   //choose one of the potential states to be the cell's next state
   updateState() : void {
-    this.state = this.newStates.reduce(chooseState, { kind:'empty' })
+    //checks to increase performance
+    if(this.newStates.length === 0) {
+      this.state = { kind:'empty' }
+      return
+    }
+    if(this.newStates.length === 1) {
+      this.state = this.newStates[0]
+      this.newStates = []
+      return
+    }
+    this.state = this.newStates.reduce(chooseState)
     this.newStates = []
   }
 

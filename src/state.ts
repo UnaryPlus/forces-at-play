@@ -1,6 +1,6 @@
-import deepEqual from 'deep-equal'
+import assert from 'assert'
 
-import { D4, D2, DRot, chooseD4, rotateD4, rotateD2 } from './direction'
+import { D4, D2, DRot, chooseD4, chooseD2, chooseDRot, rotateD4, rotateD2 } from './direction'
 
 export type Kind = 'empty' | 'wall' | 'box' | 'board' | 'destroyer'
   | 'rotator' | 'pusher' | 'shifter' | 'generator'
@@ -44,19 +44,21 @@ function orderKind(k:Kind) : number {
 
 //choose between states in case of overlap
 export function chooseState(s1:State, s2:State) : State {
-  //if states are equal, it doesn't matter
-  if(deepEqual(s1, s2)) return s1
-  if(s1.kind === s2.kind) {
-    switch(s1.kind) {
-      //vertical beats horizontal
-      case 'board': case 'destroyer': return { kind:s1.kind, dir:'vertical' }
-      //clockwise beats counterclockwise
-      case 'rotator': return { kind:'rotator', dir:'clockwise' }
-      case 'pusher': case 'shifter': case 'generator':
-        if(s1.kind === s2.kind) return { kind:s1.kind, dir:chooseD4(s1.dir, s2.dir) }
-    }
+  if(s1.kind !== s2.kind) {
+    const order1 = orderKind(s1.kind)
+    const order2 = orderKind(s2.kind)
+    return order1 > order2 ? s1 : s2
   }
-  const order1 = orderKind(s1.kind)
-  const order2 = orderKind(s2.kind)
-  return order1 > order2 ? s1 : s2
+  switch(s1.kind) {
+    case 'empty': case 'wall': case 'box': return s1
+    case 'board': case 'destroyer':
+      assert(s2.kind === s1.kind)
+      return { kind:s1.kind, dir:chooseD2(s1.dir, s2.dir) }
+    case 'rotator':
+      assert(s2.kind === 'rotator')
+      return { kind:'rotator', dir:chooseDRot(s1.dir, s2.dir) }
+    case 'pusher': case 'shifter': case 'generator':
+      assert(s2.kind === s1.kind)
+      return { kind:s1.kind, dir:chooseD4(s1.dir, s2.dir) }
+  }
 }
