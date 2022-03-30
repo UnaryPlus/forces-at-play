@@ -33,10 +33,7 @@ function sketch(p:p5) {
       //update grid every 'tickLength' frames
       if(frame % tickLength === 0) {
         grid.step()
-        const d1 = new Date()
         displayGrid()
-        const d2 = new Date()
-        console.log("display: " + (d2.getTime() - d1.getTime()))
       }
       frame++
     }

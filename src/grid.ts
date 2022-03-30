@@ -133,16 +133,9 @@ export default class Grid {
 
   //advance one full generation
   step() : void {
-    const d1 = new Date()
     this.addForces()
-    const d2 = new Date()
     this.addStates()
-    const d3 = new Date()
     this.updateStates()
-    const d4 = new Date()
-    console.log("addForces: " + (d2.getTime() - d1.getTime()))
-    console.log("addStates: " + (d3.getTime() - d2.getTime()))
-    console.log("updateStates: " + (d4.getTime() - d3.getTime()))
   }
 
   display(slRow:number, slCol:number, running:boolean, p:p5) : void {
