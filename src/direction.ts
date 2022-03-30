@@ -13,6 +13,18 @@ export function chooseD4(dir1:D4, dir2:D4) : D4 {
   return 'right'
 }
 
+//direction when two boards/destroyers merge (vertical beats horizontal)
+export function chooseD2(dir1:D2, dir2:D2) : D2 {
+  if(dir1 === 'vertical' || dir2 === 'vertical') return 'vertical'
+  return 'horizontal'
+}
+
+//direction when two rotators merge (clockwise beats counterclockwise)
+export function chooseDRot(dir1:DRot, dir2:DRot) : DRot {
+  if(dir1 === 'clockwise' || dir2 === 'clockwise') return 'clockwise'
+  return 'counterclockwise'
+}
+
 export function oppositeD4(dir:D4) : D4 {
   switch(dir) {
     case 'up': return 'down'
