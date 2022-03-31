@@ -1,5 +1,5 @@
 # Forces at Play
-A cellular automaton based on Sam Hogan's [Cell Machine](https://samhogan.itch.io/cell-machine).
+A cellular automaton.
 
 * [Try it online](https://owenbechtel.com/games/forces-at-play)
 
@@ -27,16 +27,31 @@ There are nine kinds of cell:
   cells in front of it.
 * Rotator (green square with arc)\
   Rotates the adjacent cells. There are two types of rotator:
-  the one with a "C" rotates counterclockwise, and the
-  one with a "Ɔ" rotates clockwise.
+  the one with a "C" rotates things counterclockwise, and the
+  one with a "Ɔ" rotates things clockwise.
 * Generator (yellow square with arrow)\
   Creates copies of the cell behind it.
-  
-### Compilation
-To compile for the browser, run the following commands:
 
-```
-npm install
-npx tsc
-npx browserify js/main.js -o game.js
-```
+### Controls
+Select a square by clicking or using the arrow keys. Then
+press one of the following keys to create/edit a cell:
+
+* W: wall
+* X: box
+* Z: board
+* D: destroyer
+* R: rotator
+* Q: pusher
+* S: shifter
+* A: generator
+
+Press the key multiple times to change the cell's direction. For
+example, press Q three times to make a downward-pointing pusher.
+
+You can delete a cell by pressing E, and clear the entire grid
+by pressing backspace.
+
+Once you have created an initial pattern, press space
+to run the automaton, and press space again to stop it. To change
+the animation speed, use the digit keys from 1 to 5; 1 is the
+slowest and 5 is the fastest.
