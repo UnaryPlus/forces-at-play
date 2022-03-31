@@ -55,3 +55,7 @@ Once you have created an initial pattern, press space
 to run the automaton, and press space again to stop it. To change
 the animation speed, use the digit keys from 1 to 5; 1 is the
 slowest and 5 is the fastest.
+
+### Inspiration
+This project was inspired by a video game called [Cell Machine](https://samhogan.itch.io/cell-machine)
+by Sam Hogan.
