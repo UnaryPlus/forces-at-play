@@ -197,21 +197,21 @@ export default class Grid {
   editPusher(row:number, col:number) : void {
     this.edit(row, col, (s:State) =>
       s.kind === 'pusher' ? rotateState('clockwise', s)
-      : { kind:'pusher', dir:'up' }
+      : { kind:'pusher', dir:'right' }
     )
   }
 
   editShifter(row:number, col:number) : void {
     this.edit(row, col, (s:State) =>
       s.kind === 'shifter' ? rotateState('clockwise', s)
-      : { kind:'shifter', dir:'up' }
+      : { kind:'shifter', dir:'right' }
     )
   }
 
   editGenerator(row:number, col:number) : void {
     this.edit(row, col, (s:State) =>
       s.kind === 'generator' ? rotateState('clockwise', s)
-      : { kind:'generator', dir:'up' }
+      : { kind:'generator', dir:'right' }
     )
   }
 }
