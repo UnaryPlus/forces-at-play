@@ -46,7 +46,7 @@ press one of the following keys to create/edit a cell:
 * A: generator
 
 Press the key multiple times to change the cell's direction. For
-example, press Q three times to make a downward-pointing pusher.
+example, press Q three times to make a leftward-pointing pusher.
 
 You can delete a cell by pressing E, and clear the entire grid
 by pressing backspace.
