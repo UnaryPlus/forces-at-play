@@ -79,8 +79,9 @@ export default class Grid {
   generate(row:number, col:number, dir:D4) : void {
     const [nextRow, nextCol] = move(dir, row, col)
     const [prevRow, prevCol] = move(oppositeD4(dir), row, col)
+    if(this.outOfBounds(prevRow, prevCol)) return
     const prevState = this._g[prevRow][prevCol].state
-    if(this.outOfBounds(prevRow, prevCol) || prevState.kind === 'empty') return
+    if(prevState.kind === 'empty') return
     //only create new stuff if cell in front of generator is pushable
     if(this.push(nextRow, nextCol, dir)) {
       this.addState(nextRow, nextCol, prevState)
