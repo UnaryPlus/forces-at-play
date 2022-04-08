@@ -1,6 +1,6 @@
 import assert from 'assert'
 
-import { D4, D2, DRot, chooseD4, chooseD2, chooseDRot, rotateD4, rotateD2 } from './direction'
+import { D4, D2, DRot, rotateD4, rotateD2 } from './direction'
 
 export type Kind = 'empty' | 'wall' | 'box' | 'board' | 'destroyer'
   | 'rotator' | 'pusher' | 'shifter' | 'generator'
@@ -49,16 +49,5 @@ export function chooseState(s1:State, s2:State) : State {
     const order2 = orderKind(s2.kind)
     return order1 > order2 ? s1 : s2
   }
-  switch(s1.kind) {
-    case 'empty': case 'wall': case 'box': return s1
-    case 'board': case 'destroyer':
-      assert(s2.kind === s1.kind)
-      return { kind:s1.kind, dir:chooseD2(s1.dir, s2.dir) }
-    case 'rotator':
-      assert(s2.kind === 'rotator')
-      return { kind:'rotator', dir:chooseDRot(s1.dir, s2.dir) }
-    case 'pusher': case 'shifter': case 'generator':
-      assert(s2.kind === s1.kind)
-      return { kind:s1.kind, dir:chooseD4(s1.dir, s2.dir) }
-  }
+  return Math.random() < 0.5 ? s1 : s2;
 }
