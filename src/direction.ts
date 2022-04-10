@@ -2,7 +2,6 @@ export type D4 = 'up' | 'down' | 'left' | 'right'
 export type D2 = 'vertical' | 'horizontal'
 export type DRot = 'clockwise' | 'counterclockwise'
 
-//cells can be moved, rotated, or destroyed
 export type Force = D4 | DRot | 'destroy'
 
 export function oppositeD4(dir:D4) : D4 {
@@ -71,7 +70,6 @@ export function readDRot(str:string) : DRot {
   return str === 'r' ? 'clockwise' : 'counterclockwise'
 }
 
-//move coordinates in the given direction
 export function move(dir:D4, row:number, col:number) : [number, number] {
   switch(dir) {
     case 'up': return [row - 1, col]
@@ -81,7 +79,6 @@ export function move(dir:D4, row:number, col:number) : [number, number] {
   }
 }
 
-//move coordinates by applying a set of forces
 export function moveWith(forces:Set<Force>, row:number, col:number) : [number, number] {
   const nextRow =
     forces.has('up') ? row - 1

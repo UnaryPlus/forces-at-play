@@ -5,7 +5,6 @@ import { D4, D2, DRot, rotateD4, rotateD2, showD4, readD4, showD2, readD2, showD
 export type Kind = 'empty' | 'wall' | 'box' | 'board' | 'destroyer'
   | 'rotator' | 'pusher' | 'shifter' | 'generator'
 
-//type of all possible cell states
 export type State
   = { kind:'empty' }
   | { kind:'wall' }
