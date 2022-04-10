@@ -8,6 +8,8 @@ function sketch(p:p5) {
   const cols = 40
   let slRow = 0 //selected row
   let slCol = 0 //selected column
+  let slRow2 = 0
+  let slCol2 = 0
 
   let running = false //is animation running?
   let frame = 0       //number of frames since animation started
@@ -17,7 +19,7 @@ function sketch(p:p5) {
   let grid = backupGrid
 
   function displayGrid() : void {
-    grid.display(slRow, slCol, running, p)
+    grid.display(slRow, slCol, slRow2, slCol2, running, p)
   }
 
   p.setup = function() : void {
@@ -37,9 +39,18 @@ function sketch(p:p5) {
       }
       frame++
     }
+    else if(p.mouseIsPressed) {
+      const oldSlRow2 = slRow2
+      const oldSlCol2 = slCol2
+      slRow2 = Math.floor(p.mouseY / p.height * rows)
+      slCol2 = Math.floor(p.mouseX / p.width * cols)
+      if(slRow2 !== oldSlRow2 || slCol2 !== oldSlCol2) {
+        displayGrid()
+      }
+    }
   }
 
-  p.mouseClicked = function() : void {
+  p.mousePressed = function() : void {
     if(!running) {
       //change selected cell
       slRow = Math.floor(p.mouseY / p.height * rows)

@@ -139,12 +139,12 @@ export default class Grid {
     this.updateStates()
   }
 
-  display(slRow:number, slCol:number, running:boolean, p:p5) : void {
+  display(slRow:number, slCol:number, slRow2:number, slCol2:number, running:boolean, p:p5) : void {
     const cellWidth = p.width / this.cols
     const cellHeight = p.height / this.rows
     this.loop((row:number, col:number) => {
       //don't highlight selected cell when animation is running
-      const selected = !running && row === slRow && col === slCol
+      const selected = !running && row >= slRow && col >= slCol && row <= slRow2 && col <= slCol2
       this._g[row][col].display({
         x: col * cellWidth,
         y: row * cellHeight,
