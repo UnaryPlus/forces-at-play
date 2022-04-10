@@ -1,7 +1,7 @@
 import p5 from 'p5'
 
 import { D4, D2, DRot, Force, oppositeD4, move, moveWith } from './direction'
-import { State, rotateState } from './state'
+import { State, rotateState, showState, readState } from './state'
 import Cell from './cell'
 
 export type Point = { row:number, col:number }
@@ -162,8 +162,67 @@ export class Grid {
     })
   }
 
+  copy(pt1:Point, pt2:Point) : void {
+    const top = Math.min(pt1.row, pt2.row)
+    const bottom = Math.max(pt1.row, pt2.row)
+    const left = Math.min(pt1.col, pt2.col)
+    const right = Math.max(pt1.col, pt2.col)
+
+    let text = ''
+    let empty = 0
+    for(let r = top; r <= bottom; r++) {
+      for(let c = left; c <= right; c++) {
+        if(this.outOfBounds(r, c)) continue
+        const state = this._g[r][c].state
+        if(state.kind === 'empty') empty++
+        else {
+          if(empty > 0) {
+            text += empty
+            empty = 0
+          }
+          text += showState(state)
+        }
+      }
+      empty = 0
+      text += ';'
+    }
+
+    navigator.clipboard.writeText(text)
+  }
+
+  paste(pt1:Point, pt2:Point, text:string) : void {
+    let row = Math.min(pt1.row, pt2.row)
+    let col = Math.min(pt1.col, pt2.col)
+    const left = col
+    while(text.length > 0) {
+      if(text[0] === ';') {
+        text = text.substring(1)
+        row++
+        col = left
+        continue
+      }
+      const num = parseInt(text, 10)
+      if(isNaN(num)) {
+        const [state, newText] = readState(text)
+        text = newText
+        this.setState(row, col, state)
+        col++
+      }
+      else {
+        const digits = Math.floor(Math.log10(num) + 1)
+        text = text.substring(digits)
+        col += num
+      }
+    }
+  }
+
+  setState(row:number, col:number, s:State) {
+    if(this.outOfBounds(row, col)) return
+    this._g[row][col].state = s
+  }
+
   //apply a function to the given cell's state
-  edit(pt1:Point, pt2:Point, f : (s:State) => State) : void {
+  editRegion(pt1:Point, pt2:Point, f : (s:State) => State) : void {
     const top = Math.min(pt1.row, pt2.row)
     const bottom = Math.max(pt1.row, pt2.row)
     const left = Math.min(pt1.col, pt2.col)
@@ -179,33 +238,33 @@ export class Grid {
   }
 
   editEmpty(pt1:Point, pt2:Point) : void {
-    this.edit(pt1, pt2, (s:State) => ({ kind:'empty' }))
+    this.editRegion(pt1, pt2, (s:State) => ({ kind:'empty' }))
   }
 
   editWall(pt1:Point, pt2:Point) : void {
-    this.edit(pt1, pt2, (s:State) => ({ kind:'wall' }))
+    this.editRegion(pt1, pt2, (s:State) => ({ kind:'wall' }))
   }
 
   editBox(pt1:Point, pt2:Point) : void {
-    this.edit(pt1, pt2, (s:State) => ({ kind:'box' }))
+    this.editRegion(pt1, pt2, (s:State) => ({ kind:'box' }))
   }
 
   editBoard(pt1:Point, pt2:Point) : void {
-    this.edit(pt1, pt2, (s:State) =>
+    this.editRegion(pt1, pt2, (s:State) =>
       s.kind === 'board' ? rotateState('clockwise', s)
       : { kind:'board', dir:'vertical' }
     )
   }
 
   editDestroyer(pt1:Point, pt2:Point) : void {
-    this.edit(pt1, pt2, (s:State) =>
+    this.editRegion(pt1, pt2, (s:State) =>
       s.kind === 'destroyer' ? rotateState('clockwise', s)
       : { kind:'destroyer', dir:'vertical' }
     )
   }
 
   editRotator(pt1:Point, pt2:Point) : void {
-    this.edit(pt1, pt2, (s:State) =>
+    this.editRegion(pt1, pt2, (s:State) =>
       s.kind === 'rotator' && s.dir === 'clockwise'
       ? { kind:'rotator', dir:'counterclockwise' }
       : { kind:'rotator', dir:'clockwise' }
@@ -213,21 +272,21 @@ export class Grid {
   }
 
   editPusher(pt1:Point, pt2:Point) : void {
-    this.edit(pt1, pt2, (s:State) =>
+    this.editRegion(pt1, pt2, (s:State) =>
       s.kind === 'pusher' ? rotateState('clockwise', s)
       : { kind:'pusher', dir:'right' }
     )
   }
 
   editShifter(pt1:Point, pt2:Point) : void {
-    this.edit(pt1, pt2, (s:State) =>
+    this.editRegion(pt1, pt2, (s:State) =>
       s.kind === 'shifter' ? rotateState('clockwise', s)
       : { kind:'shifter', dir:'right' }
     )
   }
 
   editGenerator(pt1:Point, pt2:Point) : void {
-    this.edit(pt1, pt2, (s:State) =>
+    this.editRegion(pt1, pt2, (s:State) =>
       s.kind === 'generator' ? rotateState('clockwise', s)
       : { kind:'generator', dir:'right' }
     )

@@ -1,6 +1,6 @@
 import assert from 'assert'
 
-import { D4, D2, DRot, rotateD4, rotateD2 } from './direction'
+import { D4, D2, DRot, rotateD4, rotateD2, showD4, readD4, showD2, readD2, showDRot, readDRot } from './direction'
 
 export type Kind = 'empty' | 'wall' | 'box' | 'board' | 'destroyer'
   | 'rotator' | 'pusher' | 'shifter' | 'generator'
@@ -50,4 +50,32 @@ export function chooseState(s1:State, s2:State) : State {
     return order1 > order2 ? s1 : s2
   }
   return Math.random() < 0.5 ? s1 : s2;
+}
+
+export function showState(s:State) : string {
+  switch(s.kind) {
+    case 'empty': return ''
+    case 'wall': return 'W'
+    case 'box': return 'E'
+    case 'board': return 'F' + showD2(s.dir)
+    case 'destroyer': return 'D' + showD2(s.dir)
+    case 'rotator': return 'R' + showDRot(s.dir)
+    case 'pusher': return 'Q' + showD4(s.dir)
+    case 'shifter': return 'S' + showD4(s.dir)
+    case 'generator': return 'A' + showD4(s.dir)
+  }
+}
+
+export function readState(str:string) : [State, string] {
+  switch(str[0]) {
+    case 'W': return [{ kind:'wall' }, str.substring(1)]
+    case 'E': return [{ kind:'box'  }, str.substring(1)]
+    case 'F': return [{ kind:'board',     dir:readD2(str[1])   }, str.substring(2)]
+    case 'D': return [{ kind:'destroyer', dir:readD2(str[1])   }, str.substring(2)]
+    case 'R': return [{ kind:'rotator',   dir:readDRot(str[1]) }, str.substring(2)]
+    case 'Q': return [{ kind:'pusher',    dir:readD4(str[1])   }, str.substring(2)]
+    case 'S': return [{ kind:'shifter',   dir:readD4(str[1])   }, str.substring(2)]
+    case 'A': return [{ kind:'generator', dir:readD4(str[1])   }, str.substring(2)]
+    default:  return [{ kind:'empty' }, str]
+  }
 }

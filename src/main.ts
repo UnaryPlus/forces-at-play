@@ -32,6 +32,26 @@ function sketch(p:p5) {
     canvas.parent('game')
     canvas.style('border', '1px solid black')
     canvas.elt.onselectstart = () => false
+
+    document.oncopy = () => {
+      grid.copy(pt1, pt2)
+    }
+
+    document.oncut = () => {
+      grid.copy(pt1, pt2)
+      grid.editEmpty(pt1, pt2)
+      displayGrid()
+      console.log('x')
+    }
+
+    document.onpaste = (event:ClipboardEvent) => {
+      if(event.clipboardData) {
+        grid.paste(pt1, pt2, event.clipboardData.getData('text'))
+        displayGrid()
+      }
+      console.log('p')
+    }
+
     displayGrid()
   }
 
@@ -80,16 +100,16 @@ function sketch(p:p5) {
       case 'arrowleft': pt1.col--; pt2.col--; break
       case 'arrowright': pt1.col++; pt2.col++; break
       //edit grid
-      case 'backspace': grid = new Grid(rows, cols); break
-      case 'e': grid.editEmpty(pt1, pt2); break
+      case 'backspace': case 'tab': grid.editEmpty(pt1, pt2); break
       case 'w': grid.editWall(pt1, pt2); break
-      case 'x': grid.editBox(pt1, pt2); break
-      case 'z': grid.editBoard(pt1, pt2); break
+      case 'e': grid.editBox(pt1, pt2); break
+      case 'f': grid.editBoard(pt1, pt2); break
       case 'd': grid.editDestroyer(pt1, pt2); break
       case 'r': grid.editRotator(pt1, pt2); break
       case 'q': grid.editPusher(pt1, pt2); break
       case 's': grid.editShifter(pt1, pt2); break
       case 'a': grid.editGenerator(pt1, pt2); break
+
       //start animation and create backup of grid
       case ' ':
         running = true
