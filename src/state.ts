@@ -65,7 +65,7 @@ export function showState(s:State) : string {
   }
 }
 
-export function readState(str:string) : [State, string] {
+export function readState(str:string) : [State, string] | null {
   switch(str[0]) {
     case 'W': return [{ kind:'wall' }, str.substring(1)]
     case 'E': return [{ kind:'box'  }, str.substring(1)]
@@ -75,6 +75,6 @@ export function readState(str:string) : [State, string] {
     case 'Q': return [{ kind:'pusher',    dir:readD4(str[1])   }, str.substring(2)]
     case 'S': return [{ kind:'shifter',   dir:readD4(str[1])   }, str.substring(2)]
     case 'A': return [{ kind:'generator', dir:readD4(str[1])   }, str.substring(2)]
-    default:  return [{ kind:'empty' }, str]
+    default:  return null
   }
 }

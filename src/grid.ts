@@ -181,13 +181,10 @@ export class Grid {
   }
 
   paste(reg:Region, text:string) : void {
+    text = text.replace(/\s+/g, '') //remove whitespace
     let row = reg.top
     let col = reg.left
     while(text.length > 0) {
-      if(/\s/.test(text[0])) {
-        text = text.substring(1)
-        continue
-      }
       if(text[0] === ';') {
         text = text.substring(1)
         row++
@@ -196,7 +193,9 @@ export class Grid {
       }
       const num = parseInt(text, 10)
       if(isNaN(num)) {
-        const [state, newText] = readState(text)
+        const result = readState(text)
+        if(result === null) return
+        const [state, newText] = result
         text = newText
         this.setState(row, col, state)
         col++
