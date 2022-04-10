@@ -1,15 +1,13 @@
 import clone from 'clone'
 import p5 from 'p5'
 
-import Grid from './grid'
+import { Point, Grid } from './grid'
 
 function sketch(p:p5) {
   const rows = 30
   const cols = 40
-  let slRow = 0 //selected row
-  let slCol = 0 //selected column
-  let slRow2 = 0
-  let slCol2 = 0
+  let pt1:Point = { row:0, col:0 }
+  let pt2:Point = { row:0, col:0 }
 
   let running = false //is animation running?
   let frame = 0       //number of frames since animation started
@@ -19,7 +17,14 @@ function sketch(p:p5) {
   let grid = backupGrid
 
   function displayGrid() : void {
-    grid.display(slRow, slCol, slRow2, slCol2, running, p)
+    grid.display(pt1, pt2, running, p)
+  }
+
+  function mousePoint() : Point {
+    return {
+      row : Math.floor(p.mouseY / p.height * rows),
+      col : Math.floor(p.mouseX / p.width * cols)
+    }
   }
 
   p.setup = function() : void {
@@ -40,11 +45,9 @@ function sketch(p:p5) {
       frame++
     }
     else if(p.mouseIsPressed) {
-      const oldSlRow2 = slRow2
-      const oldSlCol2 = slCol2
-      slRow2 = Math.floor(p.mouseY / p.height * rows)
-      slCol2 = Math.floor(p.mouseX / p.width * cols)
-      if(slRow2 !== oldSlRow2 || slCol2 !== oldSlCol2) {
+      const mouse = mousePoint()
+      if(pt2.row !== mouse.row || pt2.col !== mouse.col) {
+        pt2 = mouse
         displayGrid()
       }
     }
@@ -53,8 +56,8 @@ function sketch(p:p5) {
   p.mousePressed = function() : void {
     if(!running) {
       //change selected cell
-      slRow = Math.floor(p.mouseY / p.height * rows)
-      slCol = Math.floor(p.mouseX / p.width * cols)
+      pt1 = mousePoint()
+      pt2 = mousePoint()
       displayGrid()
     }
   }
@@ -72,21 +75,21 @@ function sketch(p:p5) {
     //'break' will redraw grid, 'return' will not
     switch(p.key.toLowerCase()) {
       //move selected cell with arrow keys
-      case 'arrowup': slRow--; break
-      case 'arrowdown': slRow++; break
-      case 'arrowleft': slCol--; break
-      case 'arrowright': slCol++; break
+      case 'arrowup': pt1.row--; pt2.row--; break
+      case 'arrowdown': pt1.row++; pt2.row++; break
+      case 'arrowleft': pt1.col--; pt2.col--; break
+      case 'arrowright': pt1.col++; pt2.col++; break
       //edit grid
       case 'backspace': grid = new Grid(rows, cols); break
-      case 'e': grid.editEmpty(slRow, slCol); break
-      case 'w': grid.editWall(slRow, slCol); break
-      case 'x': grid.editBox(slRow, slCol); break
-      case 'z': grid.editBoard(slRow, slCol); break
-      case 'd': grid.editDestroyer(slRow, slCol); break
-      case 'r': grid.editRotator(slRow, slCol); break
-      case 'q': grid.editPusher(slRow, slCol); break
-      case 's': grid.editShifter(slRow, slCol); break
-      case 'a': grid.editGenerator(slRow, slCol); break
+      case 'e': grid.editEmpty(pt1, pt2); break
+      case 'w': grid.editWall(pt1, pt2); break
+      case 'x': grid.editBox(pt1, pt2); break
+      case 'z': grid.editBoard(pt1, pt2); break
+      case 'd': grid.editDestroyer(pt1, pt2); break
+      case 'r': grid.editRotator(pt1, pt2); break
+      case 'q': grid.editPusher(pt1, pt2); break
+      case 's': grid.editShifter(pt1, pt2); break
+      case 'a': grid.editGenerator(pt1, pt2); break
       //start animation and create backup of grid
       case ' ':
         running = true

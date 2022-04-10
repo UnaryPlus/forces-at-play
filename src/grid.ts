@@ -4,7 +4,9 @@ import { D4, D2, DRot, Force, oppositeD4, move, moveWith } from './direction'
 import { State, rotateState } from './state'
 import Cell from './cell'
 
-export default class Grid {
+export type Point = { row:number, col:number }
+
+export class Grid {
   readonly rows:number
   readonly cols:number
   readonly _g:Cell[][]
@@ -139,12 +141,18 @@ export default class Grid {
     this.updateStates()
   }
 
-  display(slRow:number, slCol:number, slRow2:number, slCol2:number, running:boolean, p:p5) : void {
+  display(pt1:Point, pt2:Point, running:boolean, p:p5) : void {
     const cellWidth = p.width / this.cols
     const cellHeight = p.height / this.rows
+
+    const top = Math.min(pt1.row, pt2.row)
+    const bottom = Math.max(pt1.row, pt2.row)
+    const left = Math.min(pt1.col, pt2.col)
+    const right = Math.max(pt1.col, pt2.col)
+
     this.loop((row:number, col:number) => {
       //don't highlight selected cell when animation is running
-      const selected = !running && row >= slRow && col >= slCol && row <= slRow2 && col <= slCol2
+      const selected = !running && row >= top && row <= bottom && col >= left && col <= right
       this._g[row][col].display({
         x: col * cellWidth,
         y: row * cellHeight,
@@ -155,62 +163,71 @@ export default class Grid {
   }
 
   //apply a function to the given cell's state
-  edit(row:number, col:number, f : (s:State) => State) : void {
-    if(this.outOfBounds(row, col)) return
-    const cell = this._g[row][col]
-    cell.state = f(cell.state)
+  edit(pt1:Point, pt2:Point, f : (s:State) => State) : void {
+    const top = Math.min(pt1.row, pt2.row)
+    const bottom = Math.max(pt1.row, pt2.row)
+    const left = Math.min(pt1.col, pt2.col)
+    const right = Math.max(pt1.col, pt2.col)
+
+    for(let r = top; r <= bottom; r++) {
+      for(let c = left; c <= right; c++) {
+        if(this.outOfBounds(r, c)) continue
+        const cell = this._g[r][c]
+        cell.state = f(cell.state)
+      }
+    }
   }
 
-  editEmpty(row:number, col:number) : void {
-    this.edit(row, col, (s:State) => ({ kind:'empty' }))
+  editEmpty(pt1:Point, pt2:Point) : void {
+    this.edit(pt1, pt2, (s:State) => ({ kind:'empty' }))
   }
 
-  editWall(row:number, col:number) : void {
-    this.edit(row, col, (s:State) => ({ kind:'wall' }))
+  editWall(pt1:Point, pt2:Point) : void {
+    this.edit(pt1, pt2, (s:State) => ({ kind:'wall' }))
   }
 
-  editBox(row:number, col:number) : void {
-    this.edit(row, col, (s:State) => ({ kind:'box' }))
+  editBox(pt1:Point, pt2:Point) : void {
+    this.edit(pt1, pt2, (s:State) => ({ kind:'box' }))
   }
 
-  editBoard(row:number, col:number) : void {
-    this.edit(row, col, (s:State) =>
+  editBoard(pt1:Point, pt2:Point) : void {
+    this.edit(pt1, pt2, (s:State) =>
       s.kind === 'board' ? rotateState('clockwise', s)
       : { kind:'board', dir:'vertical' }
     )
   }
 
-  editDestroyer(row:number, col:number) : void {
-    this.edit(row, col, (s:State) =>
+  editDestroyer(pt1:Point, pt2:Point) : void {
+    this.edit(pt1, pt2, (s:State) =>
       s.kind === 'destroyer' ? rotateState('clockwise', s)
       : { kind:'destroyer', dir:'vertical' }
     )
   }
 
-  editRotator(row:number, col:number) : void {
-    this.edit(row, col, (s:State) =>
+  editRotator(pt1:Point, pt2:Point) : void {
+    this.edit(pt1, pt2, (s:State) =>
       s.kind === 'rotator' && s.dir === 'clockwise'
       ? { kind:'rotator', dir:'counterclockwise' }
       : { kind:'rotator', dir:'clockwise' }
     )
   }
 
-  editPusher(row:number, col:number) : void {
-    this.edit(row, col, (s:State) =>
+  editPusher(pt1:Point, pt2:Point) : void {
+    this.edit(pt1, pt2, (s:State) =>
       s.kind === 'pusher' ? rotateState('clockwise', s)
       : { kind:'pusher', dir:'right' }
     )
   }
 
-  editShifter(row:number, col:number) : void {
-    this.edit(row, col, (s:State) =>
+  editShifter(pt1:Point, pt2:Point) : void {
+    this.edit(pt1, pt2, (s:State) =>
       s.kind === 'shifter' ? rotateState('clockwise', s)
       : { kind:'shifter', dir:'right' }
     )
   }
 
-  editGenerator(row:number, col:number) : void {
-    this.edit(row, col, (s:State) =>
+  editGenerator(pt1:Point, pt2:Point) : void {
+    this.edit(pt1, pt2, (s:State) =>
       s.kind === 'generator' ? rotateState('clockwise', s)
       : { kind:'generator', dir:'right' }
     )
