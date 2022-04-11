@@ -55,7 +55,7 @@ Use ctrl-V to paste the copied pattern.
 When you copy a pattern, a text representation of that pattern is saved to your
 device's clipboard. This allows you to save and import patterns by converting
 them into text and vice versa. For example, try pasting the following text
-onto the canvas `Pzerzfr`.
+onto the canvas: `Pzerzfr`.
 
 ### Inspiration
 This project was inspired by a video game called [Cell Machine](https://samhogan.itch.io/cell-machine)
