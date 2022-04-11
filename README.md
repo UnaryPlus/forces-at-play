@@ -48,6 +48,15 @@ There are nine kinds of cell:
 * Space: start/stop automaton
 * Digits 1-5: change animation speed (1 is slowest, 5 is fastest)
 
+### Copy and paste
+You can copy and cut regions of the grid using ctrl-C and ctrl-X respectively.
+Use ctrl-V to paste the copied pattern.
+
+When you copy a pattern, a text representation of that pattern is saved to your
+device's clipboard. This allows you to save and import patterns by converting
+them into text and vice versa. For example, try pasting the following text
+onto the canvas `Pzerzfr`.
+
 ### Inspiration
 This project was inspired by a video game called [Cell Machine](https://samhogan.itch.io/cell-machine)
 by Sam Hogan.
