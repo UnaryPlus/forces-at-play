@@ -16,7 +16,7 @@ There are nine kinds of cell:
 * Wall (solid black square)\
   Cannot be moved by other cells.
 * Board (black square with parallel lines)\
-  A hybrid of the box and the wall. Boards with horizontal lines
+  Boards with horizontal lines
   can move horizontally but not vertically; boards with vertical
   lines can move vertically but not horizontally.
 * Destroyer (red square with parallel lines)\
@@ -33,12 +33,13 @@ There are nine kinds of cell:
   Creates copies of the cell behind it.
 
 ### Controls
-Select a square by clicking or using the arrow keys. Then
-press one of the following keys to create/edit a cell:
+Select a square by clicking or using the arrow keys. 
+Select a rectangular region by dragging the cursor. 
+Press one of the following keys to create/edit a cell:
 
 * W: wall
-* X: box
-* Z: board
+* E: box
+* F: board
 * D: destroyer
 * R: rotator
 * Q: pusher
@@ -48,8 +49,7 @@ press one of the following keys to create/edit a cell:
 Press the key multiple times to change the cell's direction. For
 example, press Q three times to make a leftward-pointing pusher.
 
-You can delete a cell by pressing E, and clear the entire grid
-by pressing backspace.
+You can delete a region by pressing backspace.
 
 Once you have created an initial pattern, press space
 to run the automaton, and press space again to stop it. To change
