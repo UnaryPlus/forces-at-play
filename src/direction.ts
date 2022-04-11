@@ -36,40 +36,6 @@ export function rotateD2(dir:D2) : D2 {
   return dir === 'vertical' ? 'horizontal' : 'vertical'
 }
 
-export function showD4(dir:D4) : string {
-  switch(dir) {
-    case 'up': return 'u'
-    case 'down': return 'd'
-    case 'left': return 'l'
-    case 'right': return 'r'
-  }
-}
-
-export function readD4(str:string) : D4 {
-  switch(str) {
-    case 'u': return 'up'
-    case 'd': return 'down'
-    case 'l': return 'left'
-    default: return 'right'
-  }
-}
-
-export function showD2(dir:D2) : string {
-  return dir === 'vertical' ? 'v' : 'h'
-}
-
-export function readD2(str:string) : D2 {
-  return str === 'v' ? 'vertical' : 'horizontal'
-}
-
-export function showDRot(dir:DRot) : string {
-  return dir === 'clockwise' ? 'r' : 'l'
-}
-
-export function readDRot(str:string) : DRot {
-  return str === 'r' ? 'clockwise' : 'counterclockwise'
-}
-
 export function move(dir:D4, row:number, col:number) : [number, number] {
   switch(dir) {
     case 'up': return [row - 1, col]

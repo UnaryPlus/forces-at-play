@@ -174,7 +174,7 @@ export class Grid {
         }
       }
       empty = 0
-      text += ';'
+      if(r !== reg.bottom) text += ';'
     }
 
     navigator.clipboard.writeText(text)
@@ -193,10 +193,9 @@ export class Grid {
       }
       const num = parseInt(text, 10)
       if(isNaN(num)) {
-        const result = readState(text)
-        if(result === null) return
-        const [state, newText] = result
-        text = newText
+        const state = readState(text[0])
+        if(state === null) return
+        text = text.substring(1)
         this.setState(row, col, state)
         col++
       }

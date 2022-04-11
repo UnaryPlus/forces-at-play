@@ -1,6 +1,6 @@
 import assert from 'assert'
 
-import { D4, D2, DRot, rotateD4, rotateD2, showD4, readD4, showD2, readD2, showDRot, readDRot } from './direction'
+import { D4, D2, DRot, rotateD4, rotateD2 } from './direction'
 
 export type Kind = 'empty' | 'wall' | 'box' | 'board' | 'destroyer'
   | 'rotator' | 'pusher' | 'shifter' | 'generator'
@@ -54,27 +54,58 @@ export function chooseState(s1:State, s2:State) : State {
 export function showState(s:State) : string {
   switch(s.kind) {
     case 'empty': return ''
-    case 'wall': return 'W'
-    case 'box': return 'E'
-    case 'board': return 'F' + showD2(s.dir)
-    case 'destroyer': return 'D' + showD2(s.dir)
-    case 'rotator': return 'R' + showDRot(s.dir)
-    case 'pusher': return 'Q' + showD4(s.dir)
-    case 'shifter': return 'S' + showD4(s.dir)
-    case 'generator': return 'A' + showD4(s.dir)
+    case 'wall': return 'w'
+    case 'box': return 'e'
+    case 'board': return s.dir === 'vertical' ? 'f' : 'F'
+    case 'destroyer': return s.dir === 'vertical' ? 'd' : 'D'
+    case 'rotator': return s.dir === 'clockwise' ? 'r' : 'R'
+
+    case 'pusher':
+      switch(s.dir) {
+        case 'up': return 'q'
+        case 'down': return 'Q'
+        case 'left': return 'p'
+        case 'right': return 'P'
+      }
+    case 'shifter':
+      switch(s.dir) {
+        case 'up': return 's'
+        case 'down': return 'S'
+        case 'left': return 'z'
+        case 'right': return 'Z'
+      }
+    case 'generator':
+      switch(s.dir) {
+        case 'up': return 'a'
+        case 'down': return 'A'
+        case 'left': return 'g'
+        case 'right': return 'G'
+      }
   }
 }
 
-export function readState(str:string) : [State, string] | null {
-  switch(str[0]) {
-    case 'W': return [{ kind:'wall' }, str.substring(1)]
-    case 'E': return [{ kind:'box'  }, str.substring(1)]
-    case 'F': return [{ kind:'board',     dir:readD2(str[1])   }, str.substring(2)]
-    case 'D': return [{ kind:'destroyer', dir:readD2(str[1])   }, str.substring(2)]
-    case 'R': return [{ kind:'rotator',   dir:readDRot(str[1]) }, str.substring(2)]
-    case 'Q': return [{ kind:'pusher',    dir:readD4(str[1])   }, str.substring(2)]
-    case 'S': return [{ kind:'shifter',   dir:readD4(str[1])   }, str.substring(2)]
-    case 'A': return [{ kind:'generator', dir:readD4(str[1])   }, str.substring(2)]
-    default:  return null
+export function readState(str:String) : State | null {
+  switch(str) {
+    case 'w': return { kind:'wall' }
+    case 'e': return { kind:'box' }
+    case 'f': return { kind:'board', dir:'vertical' }
+    case 'F': return { kind:'board', dir:'horizontal' }
+    case 'd': return { kind:'destroyer', dir:'vertical' }
+    case 'D': return { kind:'destroyer', dir:'horizontal' }
+    case 'r': return { kind:'rotator', dir:'clockwise' }
+    case 'R': return { kind:'rotator', dir:'counterclockwise' }
+    case 'q': return { kind:'pusher', dir:'up' }
+    case 'Q': return { kind:'pusher', dir:'down' }
+    case 'p': return { kind:'pusher', dir:'left' }
+    case 'P': return { kind:'pusher', dir:'right' }
+    case 's': return { kind:'shifter', dir:'up' }
+    case 'S': return { kind:'shifter', dir:'down' }
+    case 'z': return { kind:'shifter', dir:'left' }
+    case 'Z': return { kind:'shifter', dir:'right' }
+    case 'a': return { kind:'generator', dir:'up' }
+    case 'A': return { kind:'generator', dir:'down' }
+    case 'g': return { kind:'generator', dir:'left' }
+    case 'G': return { kind:'generator', dir:'right' }
+    default: return null
   }
 }
