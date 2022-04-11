@@ -1,23 +1,42 @@
 import clone from 'clone'
 import p5 from 'p5'
 
-import Grid from './grid'
+import { Region, Grid } from './grid'
 
 function sketch(p:p5) {
   const rows = 30
   const cols = 40
-  let slRow = 0 //selected row
-  let slCol = 0 //selected column
+  let aRow = 0
+  let aCol = 0
+  let bRow = 0
+  let bCol = 0
 
-  let running = false //is animation running?
-  let frame = 0       //number of frames since animation started
-  let tickLength = 10 //frames per generation
+  let running = false
+  let frame = 0
+  let tickLength = 10
 
   let backupGrid = new Grid(rows, cols)
   let grid = backupGrid
 
   function displayGrid() : void {
-    grid.display(slRow, slCol, running, p)
+    grid.display(region(), running, p)
+  }
+
+  function mouseRow() : number {
+    return Math.floor(p.mouseY / p.height * rows)
+  }
+
+  function mouseCol() : number {
+    return Math.floor(p.mouseX / p.width * cols)
+  }
+
+  function region() : Region {
+    return {
+      top : p.min(aRow, bRow),
+      bottom : p.max(aRow, bRow),
+      left : p.min(aCol, bCol),
+      right : p.max(aCol, bCol)
+    }
   }
 
   p.setup = function() : void {
@@ -26,31 +45,56 @@ function sketch(p:p5) {
     canvas.style('border', '1px solid black')
     canvas.elt.onselectstart = () => false
     displayGrid()
+
+    document.oncopy = () => {
+      grid.copy(region())
+    }
+
+    document.oncut = () => {
+      grid.copy(region())
+      grid.editEmpty(region())
+      displayGrid()
+    }
+
+    document.onpaste = (event:ClipboardEvent) => {
+      if(event.clipboardData) {
+        grid.paste(region(), event.clipboardData.getData('text'))
+        displayGrid()
+      }
+    }
   }
 
   p.draw = function() : void {
     if(running) {
-      //update grid every 'tickLength' frames
       if(frame % tickLength === 0) {
         grid.step()
         displayGrid()
       }
       frame++
     }
+    else if(p.mouseIsPressed) {
+      const row = mouseRow()
+      const col = mouseCol()
+      if(bRow !== row || bCol !== col) {
+        bRow = row
+        bCol = col
+        displayGrid()
+      }
+    }
   }
 
-  p.mouseClicked = function() : void {
+  p.mousePressed = function() : void {
     if(!running) {
-      //change selected cell
-      slRow = Math.floor(p.mouseY / p.height * rows)
-      slCol = Math.floor(p.mouseX / p.width * cols)
+      aRow = mouseRow()
+      bRow = mouseRow()
+      aCol = mouseCol()
+      bCol = mouseCol()
       displayGrid()
     }
   }
 
   function keyPressedRunning() : void {
     if(p.key === ' ') {
-      //stop animation and restore initial grid
       running = false
       grid = backupGrid
       displayGrid()
@@ -60,23 +104,21 @@ function sketch(p:p5) {
   function keyPressedPaused() : void {
     //'break' will redraw grid, 'return' will not
     switch(p.key.toLowerCase()) {
-      //move selected cell with arrow keys
-      case 'arrowup': slRow--; break
-      case 'arrowdown': slRow++; break
-      case 'arrowleft': slCol--; break
-      case 'arrowright': slCol++; break
-      //edit grid
-      case 'backspace': grid = new Grid(rows, cols); break
-      case 'e': grid.editEmpty(slRow, slCol); break
-      case 'w': grid.editWall(slRow, slCol); break
-      case 'x': grid.editBox(slRow, slCol); break
-      case 'z': grid.editBoard(slRow, slCol); break
-      case 'd': grid.editDestroyer(slRow, slCol); break
-      case 'r': grid.editRotator(slRow, slCol); break
-      case 'q': grid.editPusher(slRow, slCol); break
-      case 's': grid.editShifter(slRow, slCol); break
-      case 'a': grid.editGenerator(slRow, slCol); break
-      //start animation and create backup of grid
+      case 'arrowup': aRow--; bRow--; break
+      case 'arrowdown': aRow++; bRow++; break
+      case 'arrowleft': aCol--; bCol--; break
+      case 'arrowright': aCol++; bCol++; break
+
+      case 'backspace': case 'tab': grid.editEmpty(region()); break
+      case 'w': grid.editWall(region()); break
+      case 'e': grid.editBox(region()); break
+      case 'f': grid.editBoard(region()); break
+      case 'd': grid.editDestroyer(region()); break
+      case 'r': grid.editRotator(region()); break
+      case 'q': grid.editPusher(region()); break
+      case 's': grid.editShifter(region()); break
+      case 'a': grid.editGenerator(region()); break
+
       case ' ':
         running = true
         frame = 0
@@ -90,7 +132,6 @@ function sketch(p:p5) {
   p.keyPressed = function() : boolean {
     if(running) keyPressedRunning()
     else keyPressedPaused()
-    //change animation speed
     switch(p.key) {
       case '1': tickLength = 40; break
       case '2': tickLength = 20; break
@@ -98,7 +139,7 @@ function sketch(p:p5) {
       case '4': tickLength = 5; break
       case '5': tickLength = 2; break
     }
-    return false
+    return false //prevent scrolling with arrow keys
   }
 }
 

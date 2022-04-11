@@ -28,7 +28,6 @@ function rectColor(k:Kind, selected:boolean) : string {
   }
 }
 
-//type defining a rectangle in 2D space
 type Rect = { x:number, y:number, width:number, height:number }
 
 //draw a white square inside the rectangle
@@ -121,7 +120,6 @@ export default class Cell {
 
   //choose one of the potential states to be the cell's next state
   updateState() : void {
-    //checks to increase performance
     if(this.newStates.length === 0) {
       this.state = { kind:'empty' }
       return
@@ -135,7 +133,6 @@ export default class Cell {
     this.newStates = []
   }
 
-  //draw the cell at the given location using functions defined above
   display(r:Rect, selected:boolean, p:p5) : void {
     p.noStroke()
     p.fill(rectColor(this.state.kind, selected))

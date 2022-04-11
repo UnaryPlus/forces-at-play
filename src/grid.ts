@@ -1,10 +1,12 @@
 import p5 from 'p5'
 
 import { D4, D2, DRot, Force, oppositeD4, move, moveWith } from './direction'
-import { State, rotateState } from './state'
+import { State, rotateState, showState, readState } from './state'
 import Cell from './cell'
 
-export default class Grid {
+export type Region = { top:number, bottom:number, left:number, right:number }
+
+export class Grid {
   readonly rows:number
   readonly cols:number
   readonly _g:Cell[][]
@@ -12,7 +14,6 @@ export default class Grid {
   constructor(rows:number, cols:number) {
     this.rows = rows
     this.cols = cols
-    //initialise 'this._g' with empty cells
     this._g = Array.from({ length:rows }, () =>
       Array.from({ length:cols }, () => new Cell())
     )
@@ -22,16 +23,19 @@ export default class Grid {
     return row < 0 || col < 0 || row >= this.rows || col >= this.cols
   }
 
-  //apply a force to the given cell (unless out of bounds)
   addForce(row:number, col:number, f:Force) : void {
     if(this.outOfBounds(row, col)) return
     this._g[row][col].forces.add(f)
   }
 
-  //add a potential state to the given cell (unless out of bounds)
   addState(row:number, col:number, s:State) : void {
     if(this.outOfBounds(row, col)) return
     this._g[row][col].newStates.push(s)
+  }
+
+  setState(row:number, col:number, s:State) {
+    if(this.outOfBounds(row, col)) return
+    this._g[row][col].state = s
   }
 
   destroy(row:number, col:number, dir:D2) : void {
@@ -82,13 +86,11 @@ export default class Grid {
     if(this.outOfBounds(prevRow, prevCol)) return
     const prevState = this._g[prevRow][prevCol].state
     if(prevState.kind === 'empty') return
-    //only create new stuff if cell in front of generator is pushable
     if(this.push(nextRow, nextCol, dir)) {
       this.addState(nextRow, nextCol, prevState)
     }
   }
 
-  //call function with every row and column number
   loop(f : (row:number, col:number) => void) : void {
     for(let row = 0; row < this.rows; row++) {
       for(let col = 0; col < this.cols; col++) {
@@ -132,19 +134,19 @@ export default class Grid {
     })
   }
 
-  //advance one full generation
   step() : void {
     this.addForces()
     this.addStates()
     this.updateStates()
   }
 
-  display(slRow:number, slCol:number, running:boolean, p:p5) : void {
+  display(reg:Region, running:boolean, p:p5) : void {
     const cellWidth = p.width / this.cols
     const cellHeight = p.height / this.rows
+
     this.loop((row:number, col:number) => {
-      //don't highlight selected cell when animation is running
-      const selected = !running && row === slRow && col === slCol
+      const selected = !running && row >= reg.top && row <= reg.bottom
+        && col >= reg.left && col <= reg.right
       this._g[row][col].display({
         x: col * cellWidth,
         y: row * cellHeight,
@@ -154,63 +156,117 @@ export default class Grid {
     })
   }
 
-  //apply a function to the given cell's state
-  edit(row:number, col:number, f : (s:State) => State) : void {
-    if(this.outOfBounds(row, col)) return
-    const cell = this._g[row][col]
-    cell.state = f(cell.state)
+  copy(reg:Region) : void {
+    let text = ''
+    let empty = 0
+
+    for(let r = reg.top; r <= reg.bottom; r++) {
+      for(let c = reg.left; c <= reg.right; c++) {
+        if(this.outOfBounds(r, c)) continue
+        const state = this._g[r][c].state
+        if(state.kind === 'empty') empty++
+        else {
+          if(empty > 0) {
+            text += empty
+            empty = 0
+          }
+          text += showState(state)
+        }
+      }
+      empty = 0
+      if(r !== reg.bottom) text += ';'
+    }
+
+    navigator.clipboard.writeText(text)
   }
 
-  editEmpty(row:number, col:number) : void {
-    this.edit(row, col, (s:State) => ({ kind:'empty' }))
+  paste(reg:Region, text:string) : void {
+    text = text.replace(/\s+/g, '') //remove whitespace
+    let row = reg.top
+    let col = reg.left
+    while(text.length > 0) {
+      if(text[0] === ';') {
+        text = text.substring(1)
+        row++
+        col = reg.left
+        continue
+      }
+      const num = parseInt(text, 10)
+      if(isNaN(num)) {
+        const state = readState(text[0])
+        if(state === null) return
+        text = text.substring(1)
+        this.setState(row, col, state)
+        col++
+      }
+      else {
+        const digits = Math.floor(Math.log10(num) + 1)
+        text = text.substring(digits)
+        col += num
+      }
+    }
   }
 
-  editWall(row:number, col:number) : void {
-    this.edit(row, col, (s:State) => ({ kind:'wall' }))
+  editRegion(reg:Region, f : (s:State) => State) : void {
+    for(let r = reg.top; r <= reg.bottom; r++) {
+      for(let c = reg.left; c <= reg.right; c++) {
+        if(this.outOfBounds(r, c)) continue
+        const cell = this._g[r][c]
+        cell.state = f(cell.state)
+      }
+    }
   }
 
-  editBox(row:number, col:number) : void {
-    this.edit(row, col, (s:State) => ({ kind:'box' }))
+  editEmpty(reg:Region) : void {
+    this.editRegion(reg, (s:State) => ({ kind:'empty' }))
   }
 
-  editBoard(row:number, col:number) : void {
-    this.edit(row, col, (s:State) =>
+  editWall(reg:Region) : void {
+    this.editRegion(reg, (s:State) => ({ kind:'wall' }))
+  }
+
+  editBox(reg:Region) : void {
+    this.editRegion(reg, (s:State) => ({ kind:'box' }))
+  }
+
+  editBoard(reg:Region) : void {
+    this.editRegion(reg, (s:State) =>
       s.kind === 'board' ? rotateState('clockwise', s)
       : { kind:'board', dir:'vertical' }
     )
   }
 
-  editDestroyer(row:number, col:number) : void {
-    this.edit(row, col, (s:State) =>
+  editDestroyer(reg:Region) : void {
+    this.editRegion(reg, (s:State) =>
       s.kind === 'destroyer' ? rotateState('clockwise', s)
       : { kind:'destroyer', dir:'vertical' }
     )
   }
 
-  editRotator(row:number, col:number) : void {
-    this.edit(row, col, (s:State) =>
+  editRotator(reg:Region) : void {
+    this.editRegion(reg, (s:State) =>
       s.kind === 'rotator' && s.dir === 'clockwise'
       ? { kind:'rotator', dir:'counterclockwise' }
       : { kind:'rotator', dir:'clockwise' }
     )
   }
 
-  editPusher(row:number, col:number) : void {
-    this.edit(row, col, (s:State) =>
+  editPusher(reg:Region) : void {
+    this.editRegion(reg, (s:State) =>
       s.kind === 'pusher' ? rotateState('clockwise', s)
       : { kind:'pusher', dir:'right' }
     )
   }
 
-  editShifter(row:number, col:number) : void {
-    this.edit(row, col, (s:State) =>
+  editShifter(reg:Region) : void {
+    this.editRegion(reg, (s:State) =>
       s.kind === 'shifter' ? rotateState('clockwise', s)
       : { kind:'shifter', dir:'right' }
     )
   }
 
-  editGenerator(row:number, col:number) : void {
-    this.edit(row, col, (s:State) =>
+  editGenerator(reg:Region) : void {
+    this.editRegion(reg, (s:State) =>
       s.kind === 'generator' ? rotateState('clockwise', s)
       : { kind:'generator', dir:'right' }
     )
