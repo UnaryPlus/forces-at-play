@@ -33,28 +33,20 @@ There are nine kinds of cell:
   Creates copies of the cell behind it.
 
 ### Controls
-Select a square by clicking or using the arrow keys. 
-Select a rectangular region by dragging the cursor. 
-Press one of the following keys to create/edit a cell:
-
-* W: wall
-* E: box
-* F: board
-* D: destroyer
-* R: rotator
-* Q: pusher
-* S: shifter
-* A: generator
-
-Press the key multiple times to change the cell's direction. For
-example, press Q three times to make a leftward-pointing pusher.
-
-You can delete a region by pressing backspace.
-
-Once you have created an initial pattern, press space
-to run the automaton, and press space again to stop it. To change
-the animation speed, use the digit keys from 1 to 5; 1 is the
-slowest and 5 is the fastest.
+* Click: select cell
+* Click and drag: select region
+* Arrow keys: move selected region
+* W: create wall
+* E: create box
+* F: create/edit board
+* D: create/edit destroyer
+* R: create/edit rotator
+* Q: create/edit pusher
+* S: create/edit shifter
+* A: create/edit generator
+* Backspace: delete region
+* Space: start/stop automaton
+* Digits 1-5: change animation speed (1 is slowest, 5 is fastest)
 
 ### Inspiration
 This project was inspired by a video game called [Cell Machine](https://samhogan.itch.io/cell-machine)
