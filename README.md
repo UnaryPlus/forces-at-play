@@ -2,6 +2,7 @@
 A cellular automaton.
 
 * [Try it online](https://owenbechtel.com/games/forces-at-play)
+* To compile, run `npx tsc && npx browserify js/main.js -o game.js`
 
 ### Cell types
 There are nine kinds of cell:
