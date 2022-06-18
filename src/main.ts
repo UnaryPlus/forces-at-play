@@ -1,3 +1,7 @@
+/* (c) 2022 Owen Bechtel
+ * Licence: MIT (see LICENSE file)
+ */
+
 import clone from 'clone'
 import p5 from 'p5'
 

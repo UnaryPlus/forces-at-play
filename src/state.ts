@@ -1,3 +1,7 @@
+/* (c) 2022 Owen Bechtel
+ * Licence: MIT (see LICENSE file)
+ */
+ 
 import assert from 'assert'
 
 import { D4, D2, DRot, rotateD4, rotateD2 } from './direction'

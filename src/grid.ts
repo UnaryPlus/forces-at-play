@@ -1,3 +1,7 @@
+/* (c) 2022 Owen Bechtel
+ * Licence: MIT (see LICENSE file)
+ */
+
 import p5 from 'p5'
 
 import { D4, D2, DRot, Force, oppositeD4, move, moveWith } from './direction'

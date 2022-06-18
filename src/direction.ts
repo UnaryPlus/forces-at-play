@@ -1,3 +1,7 @@
+/* (c) 2022 Owen Bechtel
+ * Licence: MIT (see LICENSE file)
+ */
+
 export type D4 = 'up' | 'down' | 'left' | 'right'
 export type D2 = 'vertical' | 'horizontal'
 export type DRot = 'clockwise' | 'counterclockwise'
