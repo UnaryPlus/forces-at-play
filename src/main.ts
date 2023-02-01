@@ -143,7 +143,11 @@ function sketch(p:p5) {
       case '4': tickLength = 5; break
       case '5': tickLength = 2; break
     }
-    return false //prevent scrolling with arrow keys
+
+    //prevent scrolling with arrow keys
+    return p.key.substring(0, 5) !== 'Arrow'
+      && p.key !== ' '
+      && p.key !== 'Tab'
   }
 }
 
