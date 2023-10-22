@@ -46,13 +46,21 @@ function orderKind(k:Kind) : number {
 }
 
 //choose between states in case of overlap
-export function chooseState(s1:State, s2:State) : State {
-  if(s1.kind !== s2.kind) {
-    const order1 = orderKind(s1.kind)
-    const order2 = orderKind(s2.kind)
-    return order1 > order2 ? s1 : s2
+export function chooseState(states:State[]) : State {
+  let maxOrder = 0
+  let choices:State[] = []
+  for(let i = 0; i < states.length; i++) {
+    const s = states[i]
+    const order = orderKind(s.kind)
+    if(order > maxOrder) {
+      maxOrder = order
+      choices = [s]
+    }
+    else if(order == maxOrder) {
+      choices.push(s)
+    }
   }
-  return Math.random() < 0.5 ? s1 : s2;
+  return choices[Math.floor(Math.random() * choices.length)]
 }
 
 export function showState(s:State) : string {

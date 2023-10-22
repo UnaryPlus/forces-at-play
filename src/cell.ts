@@ -133,7 +133,7 @@ export default class Cell {
       this.newStates = []
       return
     }
-    this.state = this.newStates.reduce(chooseState)
+    this.state = chooseState(this.newStates)
     this.newStates = []
   }
 
